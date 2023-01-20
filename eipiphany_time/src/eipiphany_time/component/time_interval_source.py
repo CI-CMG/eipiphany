@@ -3,9 +3,9 @@ from datetime import datetime
 from multiprocessing import Process
 from time import sleep
 
-from autoqc_pipeline.routepy.framework.exchange import Exchange
-from autoqc_pipeline.routepy.framework.process_joiner import ProcessJoiner
-from autoqc_pipeline.routepy.framework.source import Source
+from eipiphany_core.component.joiner.process_joiner import ProcessJoiner
+from eipiphany_core.framework.base.source import Source
+from eipiphany_core.message.exchange import Exchange
 
 logger = logging.getLogger(__name__)
 

@@ -18,9 +18,10 @@
   </properties>
 
   <modules>
-    <module>core</module>
-    <module>file</module>
-    <module>seda</module>
+    <module>eipiphany_core</module>
+    <module>eipiphany_file</module>
+    <module>eipiphany_seda</module>
+    <module>eipiphany_time</module>
   </modules>
 
   <build>

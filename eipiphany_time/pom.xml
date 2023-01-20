@@ -10,7 +10,7 @@
     <version>0.1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>eipiphany-file</artifactId>
+  <artifactId>eipiphany-time</artifactId>
   <packaging>pom</packaging>
 
 
@@ -73,7 +73,7 @@
               <directory>htmlcov</directory>
             </fileset>
             <fileset>
-              <directory>src/eipiphany_file.egg-info</directory>
+              <directory>src/eipiphany_time.egg-info</directory>
             </fileset>
             <fileset>
               <directory>.pytest_cache</directory>
@@ -156,7 +156,7 @@
                 <argument>run-test.py</argument>
               </arguments>
               <environmentVariables>
-                <PYTHONPATH>..${file.separator}core${file.separator}src</PYTHONPATH>
+                <PYTHONPATH>${project.parent.basedir}${file.separator}eipiphany_core${file.separator}src</PYTHONPATH>
               </environmentVariables>
             </configuration>
           </execution>
@@ -229,7 +229,7 @@
               <arguments>
                 <argument>install</argument>
                 <argument>-I</argument>
-                <argument>dist/eipiphany_file-${wheel.version}-py3-none-any.whl</argument>
+                <argument>dist/eipiphany_seda-${wheel.version}-py3-none-any.whl</argument>
               </arguments>
             </configuration>
           </execution>

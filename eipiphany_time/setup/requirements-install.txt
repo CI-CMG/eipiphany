@@ -1,0 +1,1 @@
+eipiphany-core==${wheel.version}

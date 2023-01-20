@@ -156,7 +156,7 @@
                 <argument>run-test.py</argument>
               </arguments>
               <environmentVariables>
-                <PYTHONPATH>..${file.separator}core${file.separator}src</PYTHONPATH>
+                <PYTHONPATH>${project.parent.basedir}${file.separator}eipiphany_core${file.separator}src</PYTHONPATH>
               </environmentVariables>
             </configuration>
           </execution>
