@@ -1,7 +1,5 @@
 from multiprocessing import Process
 
-from eipiphany_core.component.joiner.multi_process_joiner import \
-  MultiProcessJoiner
 from eipiphany_core.framework.base.source import Source
 from eipiphany_core.message.exchange import Exchange
 
@@ -23,7 +21,7 @@ class QueueSource(Source):
       p.daemon = True
       p.start()
       consumer_process.append(p)
-    return MultiProcessJoiner(consumer_process)
+    return consumer_process
 
   def wait_for_event(self):
     return Exchange(self.__queue.get())

@@ -1,3 +1,4 @@
+import copy
 import logging
 
 from .exchange_handler import ExchangeHandler
@@ -10,22 +11,32 @@ logger = logging.getLogger(__name__)
 
 class Route(object):
 
-  def __init__(self, source, error_handler):
+  def __init__(self, source, error_handler, route_id):
     self.__source = source
-    self.__source_wrapper = SourceWrapper(source, self)
-    source.set_source_wrapper(self.__source_wrapper)
-    self.__exchange_handlers = []
+    self._source_wrapper = SourceWrapper(source, self)
+    source.set_source_wrapper(self._source_wrapper)
+    self._exchange_handlers = []
     self.__error_handler = error_handler
+    self.__route_id = route_id
+
+  @property
+  def route_id(self):
+    return self.__route_id
 
   # todo move this to separate class
   def process(self, exchange):
     try:
-      for exchange_handler in self.__exchange_handlers:
+      next_exchange = copy.deepcopy(exchange)
+      for exchange_handler in self._exchange_handlers:
         if exchange_handler.processor:
-          exchange_handler.processor.process(exchange)
+          exchange_handler.processor.process(next_exchange)
         elif exchange_handler.filter:
-          keep_going = exchange_handler.filter.filter(exchange)
+          keep_going = exchange_handler.filter.filter(next_exchange)
           if not keep_going:
+            break
+        elif exchange_handler.aggregate:
+          next_exchange = exchange_handler.aggregate.aggregate(next_exchange)
+          if not next_exchange:
             break
         else:
           raise Exception("Internal error: invalid exchange handler")
@@ -40,11 +51,11 @@ class Route(object):
         logger.error("Original exception", exc_info=err)
 
   def to(self, processor):
-    self.__exchange_handlers.append(ExchangeHandler().set_processor(processor))
+    self._exchange_handlers.append(ExchangeHandler().set_processor(processor))
     return self
 
   def filter(self, filter):
-    self.__exchange_handlers.append(ExchangeHandler().set_filter(filter))
+    self._exchange_handlers.append(ExchangeHandler().set_filter(filter))
     return self
 
   def error_handler(self, error_handler):
@@ -52,5 +63,5 @@ class Route(object):
     return self
 
   def start(self):
-    return self.__source_wrapper.start()
+    return self._source_wrapper.start()
 

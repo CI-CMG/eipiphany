@@ -3,8 +3,6 @@ import signal
 from multiprocessing import Process, JoinableQueue
 
 from PySide6 import QtCore, QtWidgets
-from eipiphany_core.component.joiner.multi_process_joiner import \
-  MultiProcessJoiner
 from eipiphany_core.framework.base.source import Source
 from eipiphany_core.message.exchange import Exchange
 
@@ -32,7 +30,7 @@ class FileSource(Source):
     consumer.daemon = True
     consumer.start()
     process.append(consumer)
-    return MultiProcessJoiner(process)
+    return process
 
   def __get_filter(self, ext_list):
     filter = []
@@ -87,7 +85,7 @@ class FileSource(Source):
     if exchange.get_header(FileSource.DONE_FILE_PATH):
       os.remove(exchange.get_header(FileSource.DONE_FILE_PATH))
     if self.__configuration.delete:
-      os.remove(exchange.get_body())
+      os.remove(exchange.body)
 
   def event_failure(self, err, exchange):
     self.__queue.task_done()

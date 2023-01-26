@@ -8,4 +8,4 @@ class QueueEndpoint(Processor):
     self.__block_when_full = block_when_full
 
   def process(self, exchange):
-    self.__queue.put(exchange.get_body(), self.__block_when_full)
+    self.__queue.put(exchange.body, self.__block_when_full)

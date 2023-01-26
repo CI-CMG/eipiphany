@@ -3,7 +3,6 @@ from datetime import datetime
 from multiprocessing import Process
 from time import sleep
 
-from eipiphany_core.component.joiner.process_joiner import ProcessJoiner
 from eipiphany_core.framework.base.source import Source
 from eipiphany_core.message.exchange import Exchange
 
@@ -22,7 +21,7 @@ class TimeIntervalSource(Source):
     p = Process(target=self.__source_wrapper.wait_for_events)
     p.daemon = True
     p.start()
-    return ProcessJoiner(p)
+    return [p]
 
   def wait_for_event(self):
     sleep(self.__interval_seconds)
