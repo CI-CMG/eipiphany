@@ -125,6 +125,7 @@
               <executable>pip</executable>
               <arguments>
                 <argument>install</argument>
+                <argument>-vv</argument>
                 <argument>--pre</argument>
                 <argument>-r</argument>
                 <argument>requirements.txt</argument>
