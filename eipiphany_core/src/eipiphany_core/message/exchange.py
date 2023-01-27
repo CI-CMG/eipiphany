@@ -9,6 +9,9 @@ class Exchange:
     self.headers[key] = value
     return self
 
+  def get_header(self, key):
+    return self.headers.get(key)
+
   @property
   def body(self):
     return self.__body
