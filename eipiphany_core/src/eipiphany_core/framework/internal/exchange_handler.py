@@ -4,6 +4,7 @@ class ExchangeHandler(object):
   def __init__(self):
     self.__processor = None
     self.__filter = None
+    self.__aggregate = None
 
   @property
   def processor(self):
@@ -27,4 +28,16 @@ class ExchangeHandler(object):
 
   def set_filter(self, value):
     self.__filter = value
+    return self
+
+  @property
+  def aggregate(self):
+    return self.__aggregate
+
+  @aggregate.setter
+  def aggregate(self, value):
+    self.set_aggregate(value)
+
+  def set_aggregate(self, value):
+    self.__aggregate = value
     return self

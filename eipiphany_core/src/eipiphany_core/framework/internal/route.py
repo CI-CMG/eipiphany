@@ -62,6 +62,10 @@ class Route(object):
     self.__error_handler = error_handler
     return self
 
+  def aggregate(self, aggregate):
+    self._exchange_handlers.append(ExchangeHandler().set_aggregate(aggregate))
+    return self
+
   def start(self):
     return self._source_wrapper.start()
 

@@ -26,10 +26,10 @@ class RouteBuilder(metaclass=abc.ABCMeta):
   def get_routes(self):
     return self._routes
 
-  def start(self):
-    processes = []
-    for route in self._routes:
-      for process in route.start():
-        processes.append(process)
-    return process
+  # def start(self):
+  #   processes = []
+  #   for route in self._routes:
+  #     for process in route.start():
+  #       processes.append(process)
+  #   return process
 

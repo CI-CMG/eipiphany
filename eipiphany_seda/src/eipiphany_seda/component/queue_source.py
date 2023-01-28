@@ -1,7 +1,6 @@
 from multiprocessing import Process
 
 from eipiphany_core.framework.base.source import Source
-from eipiphany_core.message.exchange import Exchange
 
 
 class QueueSource(Source):
@@ -24,7 +23,7 @@ class QueueSource(Source):
     return consumer_process
 
   def wait_for_event(self):
-    return Exchange(self.__queue.get())
+    return self.__queue.get()
 
   def event_success(self, exchange):
     self.__queue.task_done()
