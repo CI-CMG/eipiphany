@@ -1,12 +1,12 @@
 import time
 
-from ..base.default_eipiphany_context_termination import DefaultEipiphanyContextTermination
+from ..base.default_eip_context_termination import DefaultEipContextTermination
 
 
-class TestEipiphanyContextTermination(DefaultEipiphanyContextTermination):
+class TestEipContextTermination(DefaultEipContextTermination):
   def __init__(self, timeout=20000):
     self.__timeout = timeout
-    self.__mock_endpoints = {}
+    self.__mock_endpoints = []
 
   @property
   def mock_endpoints(self):
@@ -20,12 +20,12 @@ class TestEipiphanyContextTermination(DefaultEipiphanyContextTermination):
     term = super().is_terminate(context)
     if term:
       return True
-    if self.__mock_endpoints.values():
+    if self.__mock_endpoints:
       completed = 0
-      for ep in self.__mock_endpoints.values():
+      for ep in self.__mock_endpoints:
         if len(ep.exchanges) >= ep.expected_message_count:
           completed += 1
-      if completed == len(self.__mock_endpoints.values()):
+      if completed == len(self.__mock_endpoints):
         return True
     current_time = round(time.time() * 1000)
     return current_time - context.start_time >= self.__timeout

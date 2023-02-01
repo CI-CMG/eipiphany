@@ -1,14 +1,16 @@
-from ..base.processor import Processor
+from ..base.endpoint import Endpoint
 
-
-class MockEndpoint(Processor):
-  def __init__(self, context, expected_message_count):
+class MockEndpoint(Endpoint):
+  def __init__(self, context, original_endpoint, expected_message_count):
     super().__init__()
     self.__exchanges = context.manager.list()
     self.__expected_message_count = expected_message_count
+    self.__original_endpoint = original_endpoint
 
-  def process(self, exchange):
+  def process(self, exchange, configuration):
     self.exchanges.append(exchange)
+    if self.__original_endpoint:
+      self.__original_endpoint.process(exchange, configuration)
 
   @property
   def exchanges(self):

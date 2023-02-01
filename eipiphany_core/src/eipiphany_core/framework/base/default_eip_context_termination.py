@@ -1,7 +1,7 @@
-from .eipiphany_context_termination import EipiphanyContextTermination
+from .eip_context_termination import EipContextTermination
 
 
-class DefaultEipiphanyContextTermination(EipiphanyContextTermination):
+class DefaultEipContextTermination(EipContextTermination):
   def is_terminate(self, context):
     if not len(context.processes):
       return True

@@ -24,12 +24,14 @@ class Route(object):
     return self.__route_id
 
   # todo move this to separate class
-  def process(self, exchange):
+  def run(self, exchange):
     try:
       next_exchange = copy.deepcopy(exchange)
       for exchange_handler in self._exchange_handlers:
         if exchange_handler.processor:
           exchange_handler.processor.process(next_exchange)
+        elif exchange_handler.endpoint:
+          exchange_handler.endpoint.process(next_exchange, exchange_handler.endpoint_configuration)
         elif exchange_handler.filter:
           keep_going = exchange_handler.filter.filter(next_exchange)
           if not keep_going:
@@ -50,8 +52,15 @@ class Route(object):
         logger.error("Exception in error handler", exc_info=err2)
         logger.error("Original exception", exc_info=err)
 
-  def to(self, processor):
+  def process(self, processor):
     self._exchange_handlers.append(ExchangeHandler().set_processor(processor))
+    return self
+
+  def to(self, eip_context, endpoint_id, endpoint_configuration = None):
+    self._exchange_handlers.append(
+      ExchangeHandler()
+      .set_endpoint(eip_context.get_endpoint(endpoint_id))
+      .set_endpoint_configuration(endpoint_configuration))
     return self
 
   def filter(self, filter):

@@ -5,6 +5,8 @@ class ExchangeHandler(object):
     self.__processor = None
     self.__filter = None
     self.__aggregate = None
+    self.__endpoint = None
+    self.__endpoint_configuration = None
 
   @property
   def processor(self):
@@ -16,6 +18,30 @@ class ExchangeHandler(object):
 
   def set_processor(self, value):
     self.__processor = value
+    return self
+
+  @property
+  def endpoint(self):
+    return self.__endpoint
+
+  @endpoint.setter
+  def endpoint(self, value):
+    self.set_endpoint(value)
+
+  def set_endpoint(self, value):
+    self.__endpoint = value
+    return self
+
+  @property
+  def endpoint_configuration(self):
+    return self.__endpoint
+
+  @endpoint_configuration.setter
+  def endpoint_configuration(self, value):
+    self.set_endpoint_configuration(value)
+
+  def set_endpoint_configuration(self, value):
+    self.__endpoint_configuration = value
     return self
 
   @property

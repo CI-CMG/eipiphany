@@ -1,7 +1,7 @@
 import abc
 
 
-class EipiphanyContextTermination(metaclass=abc.ABCMeta):
+class EipContextTermination(metaclass=abc.ABCMeta):
 
   @abc.abstractmethod
   def is_terminate(self, context):

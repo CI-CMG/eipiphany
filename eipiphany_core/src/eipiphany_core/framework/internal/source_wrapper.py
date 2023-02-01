@@ -7,7 +7,7 @@ class SourceWrapper:
   def wait_for_events(self):
     while True:
       exchange = self._source.wait_for_event()
-      self.__route.process(exchange)
+      self.__route.run(exchange)
 
   def start(self):
     return self._source.start()

@@ -20,7 +20,7 @@ class RouteBuilder(metaclass=abc.ABCMeta):
     self._error_handler = error_handler
 
   @abc.abstractmethod
-  def build(self):
+  def build(self, eip_context):
     pass
 
   def get_routes(self):

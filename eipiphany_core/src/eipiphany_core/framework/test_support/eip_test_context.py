@@ -1,16 +1,21 @@
 from .mock_endpoint import MockEndpoint
-from .test_eipiphany_context_termination import TestEipiphanyContextTermination
-from ..base.eipiphany_context import EipiphanyContext
+from .test_eip_context_termination import TestEipContextTermination
+from ..base.eip_context import EipContext
 from ..internal.exchange_handler import ExchangeHandler
 
 
-class EipiphanyTestContext(EipiphanyContext):
-  def __init__(self, original_context,
-      termination=TestEipiphanyContextTermination()):
+class EipTestContext(EipContext):
+  def __init__(self, original_context, termination=TestEipContextTermination()):
     self.__original_context = original_context
-    self.__mock_endpoints = {}
+    self.__mock_endpoints = []
     self.__original_context._termination = termination
     self.__original_context._termination.mock_endpoints = self.__mock_endpoints
+
+  def get_endpoint(self, endpoint_id):
+    return self.__original_context.get_endpoint(endpoint_id)
+
+  def register_endpoint(self, endpoint_id, endpoint):
+    self.__original_context.register_endpoint(endpoint_id, endpoint)
 
   def add_route_builder(self, route_builder):
     self.__original_context.add_route_builder(route_builder)
@@ -47,39 +52,17 @@ class EipiphanyTestContext(EipiphanyContext):
       raise Exception("Route with id " + route_id + " was not found")
     return the_route
 
-  def mock_endpoint(self, route_id, existing_processor,
-      expected_message_count=1):
-    the_route = self.__find_route(route_id)
-    found = []
-    exchange_handlers = the_route._exchange_handlers
-    for i in range(len(exchange_handlers)):
-      if existing_processor == exchange_handlers[i].processor:
-        found.append(i)
-    if found:
-      offset = 0
-      mock_endpoint = MockEndpoint(self.__original_context,
-                                   expected_message_count=expected_message_count)
-      for i in found:
-        exchange_handlers.insert(i + 1 + offset,
-                                 ExchangeHandler().set_processor(mock_endpoint))
-        offset = offset + 1
-      self.__mock_endpoints[existing_processor] = mock_endpoint
+  def mock_endpoint(self, endpoint_id, expected_message_count=1):
+    original_endpoint = self.get_endpoint(endpoint_id)
+    mock_endpoint = MockEndpoint(self.__original_context, original_endpoint, expected_message_count)
+    self.__mock_endpoints.append(mock_endpoint)
+    self.register_endpoint(endpoint_id, mock_endpoint)
     return self
 
-  def mock_endpoint_and_skip(self, route_id, existing_processor,
-      expected_message_count=1):
-    the_route = self.__find_route(route_id)
-    found = []
-    exchange_handlers = the_route._exchange_handlers
-    for i in range(len(exchange_handlers)):
-      if existing_processor == exchange_handlers[i].processor:
-        found.append(i)
-    if found:
-      mock_endpoint = MockEndpoint(self.__original_context,
-                                   expected_message_count=expected_message_count)
-      for i in found:
-        exchange_handlers[i] = ExchangeHandler().set_processor(mock_endpoint)
-      self.__mock_endpoints[existing_processor] = mock_endpoint
+  def mock_endpoint_and_skip(self, endpoint_id, expected_message_count=1):
+    mock_endpoint = MockEndpoint(self.__original_context, None, expected_message_count)
+    self.__mock_endpoints.append(mock_endpoint)
+    self.register_endpoint(endpoint_id, mock_endpoint)
     return self
 
   def insert_before_processor(self, route_id, existing_processor, processor):
@@ -142,7 +125,3 @@ class EipiphanyTestContext(EipiphanyContext):
     the_route = self.__find_route(route_id)
     the_route._source_wrapper._source = source
     return self
-
-  @property
-  def mock_endpoints(self):
-    return self.__mock_endpoints

@@ -1,21 +1,27 @@
 import time
 from multiprocessing import Manager
 
-from .default_eipiphany_context_termination import DefaultEipiphanyContextTermination
+from .default_eip_context_termination import DefaultEipContextTermination
 
 
-class EipiphanyContext(object):
-  def __init__(self, termination=DefaultEipiphanyContextTermination()):
+class EipContext(object):
+  def __init__(self, termination=DefaultEipContextTermination()):
     self.__manager = Manager()
     self._routes = []
     self.__processes = []
     self.__start_time = None
     self._termination = termination
+    self.__endpoint_registry = {}
+    self.__route_builders = []
+
+  def get_endpoint(self, endpoint_id):
+    return self.__endpoint_registry[endpoint_id]
+
+  def register_endpoint(self, endpoint_id, endpoint):
+    self.__endpoint_registry[endpoint_id] = endpoint
 
   def add_route_builder(self, route_builder):
-    route_builder.build()
-    for route in route_builder.get_routes():
-      self._routes.append(route)
+    self.__route_builders.append(route_builder)
     return self
 
   def __terminate(self):
@@ -25,6 +31,10 @@ class EipiphanyContext(object):
       process.close()
 
   def start(self):
+    for route_builder in self.__route_builders:
+      route_builder.build(self)
+      for route in route_builder.get_routes():
+        self._routes.append(route)
     self.__start_time = round(time.time() * 1000)
     for route in self._routes:
       for process in route.start():
