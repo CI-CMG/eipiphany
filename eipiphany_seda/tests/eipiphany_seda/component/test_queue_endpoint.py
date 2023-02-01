@@ -1,4 +1,4 @@
-from ....src.eipiphany_seda.component.queue_endpoint import QueueEndpoint
+from ....src.eipiphany_seda.component.seda_endpoint import SedaEndpoint
 
 
 class TestExchange(object):
@@ -10,4 +10,4 @@ class TestExchange(object):
   #   jdbc.query("DELETE FROM cruise.PEOPLE_AND_SOURCES")
 
   def test_simple(self):
-    exchange = QueueEndpoint(None)
+    exchange = SedaEndpoint(None)

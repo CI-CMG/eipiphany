@@ -11,8 +11,8 @@ class RouteBuilder(metaclass=abc.ABCMeta):
     self._routes = []
     self._error_handler = DefaultErrorHandler()
 
-  def _from(self, source, route_id = None):
-    route = Route(source, self._error_handler, route_id if route_id else str(self))
+  def _from(self, eip_context, endpoint_id, route_id = None):
+    route = Route(eip_context, endpoint_id, self._error_handler, route_id if route_id else str(self))
     self._routes.append(route)
     return route
 

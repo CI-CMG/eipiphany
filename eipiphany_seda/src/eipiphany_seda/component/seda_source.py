@@ -3,11 +3,11 @@ from multiprocessing import Process
 from eipiphany_core.framework.base.source import Source
 
 
-class QueueSource(Source):
+class SedaSource(Source):
 
-  def __init__(self, queue, concurrent_consumers=1):
+  def __init__(self, queue, configuration):
     self.__queue = queue
-    self.__concurrent_consumers = concurrent_consumers
+    self.__concurrent_consumers = configuration.concurrent_consumers
     self.__source_wrapper = None
 
   def set_source_wrapper(self, source_wrapper):

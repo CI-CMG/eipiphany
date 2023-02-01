@@ -2,6 +2,7 @@ import time
 from multiprocessing import Manager
 
 from .default_eip_context_termination import DefaultEipContextTermination
+from .exchange_producer import ExchangeProducer
 
 
 class EipContext(object):
@@ -13,12 +14,23 @@ class EipContext(object):
     self._termination = termination
     self.__endpoint_registry = {}
     self.__route_builders = []
+    self.__exchange_producer = ExchangeProducer(self)
+
+  def get_exchange_producer(self):
+    return self.__exchange_producer
 
   def get_endpoint(self, endpoint_id):
     return self.__endpoint_registry[endpoint_id]
 
-  def register_endpoint(self, endpoint_id, endpoint):
-    self.__endpoint_registry[endpoint_id] = endpoint
+  def register_endpoint(self, endpoint):
+    self._register_endpoint_internal(endpoint, False)
+
+  def _register_endpoint_internal(self, endpoint, allow_override):
+    prefix = endpoint.get_prefix()
+    epid = prefix + ":" + endpoint.primary_id
+    if not allow_override and self.__endpoint_registry.get(epid):
+      raise Exception(epid + " is already registered")
+    self.__endpoint_registry[epid] = endpoint
 
   def add_route_builder(self, route_builder):
     self.__route_builders.append(route_builder)

@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 class TimeIntervalSource(Source):
 
-  def __init__(self, interval_seconds):
-    self.__interval_seconds = interval_seconds
+  def __init__(self, configuration):
+    self.__interval_seconds = configuration.interval_seconds
     self.__source_wrapper = None
 
   def set_source_wrapper(self, source_wrapper):

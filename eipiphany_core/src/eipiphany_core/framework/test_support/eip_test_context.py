@@ -11,11 +11,14 @@ class EipTestContext(EipContext):
     self.__original_context._termination = termination
     self.__original_context._termination.mock_endpoints = self.__mock_endpoints
 
+  def get_exchange_producer(self):
+    return self.__original_context.get_exchange_producer()
+
   def get_endpoint(self, endpoint_id):
     return self.__original_context.get_endpoint(endpoint_id)
 
-  def register_endpoint(self, endpoint_id, endpoint):
-    self.__original_context.register_endpoint(endpoint_id, endpoint)
+  def register_endpoint(self, endpoint):
+    self.__original_context.register_endpoint(endpoint)
 
   def add_route_builder(self, route_builder):
     self.__original_context.add_route_builder(route_builder)
@@ -54,15 +57,16 @@ class EipTestContext(EipContext):
 
   def mock_endpoint(self, endpoint_id, expected_message_count=1):
     original_endpoint = self.get_endpoint(endpoint_id)
-    mock_endpoint = MockEndpoint(self.__original_context, original_endpoint, expected_message_count)
+    mock_endpoint = MockEndpoint(self.__original_context, original_endpoint, False, expected_message_count)
     self.__mock_endpoints.append(mock_endpoint)
-    self.register_endpoint(endpoint_id, mock_endpoint)
+    self.__original_context._register_endpoint_internal(mock_endpoint, True)
     return self
 
   def mock_endpoint_and_skip(self, endpoint_id, expected_message_count=1):
-    mock_endpoint = MockEndpoint(self.__original_context, None, expected_message_count)
+    original_endpoint = self.get_endpoint(endpoint_id)
+    mock_endpoint = MockEndpoint(self.__original_context, original_endpoint, True, expected_message_count)
     self.__mock_endpoints.append(mock_endpoint)
-    self.register_endpoint(endpoint_id, mock_endpoint)
+    self.__original_context._register_endpoint_internal(mock_endpoint, True)
     return self
 
   def insert_before_processor(self, route_id, existing_processor, processor):

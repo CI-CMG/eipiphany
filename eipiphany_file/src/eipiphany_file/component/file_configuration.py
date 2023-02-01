@@ -1,5 +1,5 @@
 
-class FileSourceConfiguration(object):
+class FileConfiguration(object):
   def __init__(self):
     self.__directory = None
     self.__recursive = False
