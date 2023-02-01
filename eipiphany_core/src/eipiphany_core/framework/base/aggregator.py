@@ -2,11 +2,11 @@
 class Aggregator(object):
   AGGREGATOR_COMPLETED_EXCHANGES = "AggregatorCompletedExchanges"
 
-  def __init__(self, eip_context, correlation_expression, aggregation_strategy, completion_expression_list):
+  def __init__(self, correlation_expression, aggregation_strategy, completion_expression_list):
     self.__aggregation_strategy = aggregation_strategy
     self.__correlation_expression = correlation_expression
     self.__completion_expression_list = completion_expression_list
-    self._eip_context = eip_context
+    # self._eip_context = eip_context
     # self.__aggregation_state = self._eip_context.manager.dict()
     # self.__lock = self._eip_context.manager.RLock()
 
