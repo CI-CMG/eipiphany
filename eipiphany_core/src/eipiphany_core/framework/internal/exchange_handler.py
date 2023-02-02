@@ -34,7 +34,7 @@ class ExchangeHandler(object):
 
   @property
   def endpoint_configuration(self):
-    return self.__endpoint
+    return self.__endpoint_configuration
 
   @endpoint_configuration.setter
   def endpoint_configuration(self, value):
