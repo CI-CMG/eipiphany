@@ -43,6 +43,9 @@ class EipContext(object):
       process.close()
 
   def start(self):
+    self._start_internal(None)
+
+  def _start_internal(self, after_start):
     for route_builder in self.__route_builders:
       route_builder.build(self)
       for route in route_builder.get_routes():
@@ -51,6 +54,9 @@ class EipContext(object):
     for route in self._routes:
       for process in route.start():
         self.__processes.append(process)
+    if after_start:
+      after_start.daemon = True
+      self.__processes.append(after_start.start())
     terminate = False
     while not terminate:
       time.sleep(1)

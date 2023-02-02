@@ -27,6 +27,9 @@ class EipTestContext(EipContext):
   def start(self):
     self.__original_context.start()
 
+  def start_with_trigger(self, process):
+    self.__original_context._start_internal(process)
+
   @property
   def manager(self):
     return self.__original_context.manager
