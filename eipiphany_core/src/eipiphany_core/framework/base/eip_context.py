@@ -56,7 +56,8 @@ class EipContext(object):
         self.__processes.append(process)
     if after_start:
       after_start.daemon = True
-      self.__processes.append(after_start.start())
+      after_start.start()
+      self.__processes.append(after_start)
     terminate = False
     while not terminate:
       time.sleep(1)
