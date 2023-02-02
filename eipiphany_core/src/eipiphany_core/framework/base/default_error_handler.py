@@ -1,6 +1,6 @@
 import logging
 
-from ...framework.base.error_handler import ErrorHandler
+from .error_handler import ErrorHandler
 
 logger = logging.getLogger(__name__)
 

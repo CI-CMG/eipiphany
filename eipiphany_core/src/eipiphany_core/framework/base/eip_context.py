@@ -50,6 +50,7 @@ class EipContext(object):
     for route_builder in self.__route_builders:
       route_builder.build(self)
       for route in route_builder.get_routes():
+        route._set_default_error_handler(route_builder.error_handler)
         self._routes.append(route)
     self.__start_time = round(time.time() * 1000)
     for route in self._routes:

@@ -2,7 +2,7 @@ import copy
 import logging
 
 from .exchange_handler import ExchangeHandler
-from ...framework.base.error_handler import ErrorHandler
+from ..base.error_handler import ErrorHandler
 from .source_wrapper import SourceWrapper
 
 logger = logging.getLogger(__name__)
@@ -11,12 +11,12 @@ logger = logging.getLogger(__name__)
 
 class Route(object):
 
-  def __init__(self, eip_context, endpoint_id, error_handler, route_id):
+  def __init__(self, eip_context, endpoint_id, route_id):
     self.__source = eip_context.get_endpoint(endpoint_id).get_source()
     self._source_wrapper = SourceWrapper(self.__source, self)
     self.__source.set_source_wrapper(self._source_wrapper)
     self._exchange_handlers = []
-    self.__error_handler = error_handler
+    self.__error_handler = None
     self.__route_id = route_id
 
   @property
@@ -74,6 +74,10 @@ class Route(object):
   def aggregate(self, aggregate):
     self._exchange_handlers.append(ExchangeHandler().set_aggregate(aggregate))
     return self
+
+  def _set_default_error_handler(self, error_handler):
+    if not self.__error_handler:
+      self.__error_handler = error_handler
 
   def start(self):
     return self._source_wrapper.start()

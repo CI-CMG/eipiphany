@@ -1,7 +1,7 @@
 import abc
 
-from ...framework.internal.route import Route
-from ...component.error_handler.default_error_handler import DefaultErrorHandler
+from ..internal.route import Route
+from .default_error_handler import DefaultErrorHandler
 
 
 class RouteBuilder(metaclass=abc.ABCMeta):
@@ -12,7 +12,7 @@ class RouteBuilder(metaclass=abc.ABCMeta):
     self._error_handler = DefaultErrorHandler()
 
   def _from(self, eip_context, endpoint_id, route_id = None):
-    route = Route(eip_context, endpoint_id, self._error_handler, route_id if route_id else str(self))
+    route = Route(eip_context, endpoint_id, route_id if route_id else str(self))
     self._routes.append(route)
     return route
 
@@ -25,4 +25,8 @@ class RouteBuilder(metaclass=abc.ABCMeta):
 
   def get_routes(self):
     return self._routes
+
+  @property
+  def error_handler(self):
+    return self._error_handler
 
