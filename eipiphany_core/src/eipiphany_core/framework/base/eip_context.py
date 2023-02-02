@@ -3,6 +3,7 @@ from multiprocessing import Manager
 
 from .default_eip_context_termination import DefaultEipContextTermination
 from .exchange_producer import ExchangeProducer
+from ..internal.process_wrapper import ProcessWrapper
 
 
 class EipContext(object):
@@ -38,9 +39,9 @@ class EipContext(object):
 
   def __terminate(self):
     for process in self.__processes:
-      process.terminate()
-      process.join()
-      process.close()
+      process.process.terminate()
+      process.process.join()
+      process.process.close()
 
   def start(self):
     self._start_internal(None)
@@ -53,11 +54,11 @@ class EipContext(object):
     self.__start_time = round(time.time() * 1000)
     for route in self._routes:
       for process in route.start():
-        self.__processes.append(process)
+        self.__processes.append(ProcessWrapper(process))
     if after_start:
       after_start.daemon = True
       after_start.start()
-      self.__processes.append(after_start)
+      self.__processes.append(ProcessWrapper(after_start, can_terminate=True))
     terminate = False
     while not terminate:
       time.sleep(1)
