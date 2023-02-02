@@ -1,5 +1,6 @@
 import copy
 import logging
+import traceback
 
 from .exchange_handler import ExchangeHandler
 from ..base.error_handler import ErrorHandler
@@ -45,12 +46,12 @@ class Route(object):
       self.__source.event_success(exchange)
     except Exception as err:
       try:
-        exchange.set_header(ErrorHandler.EXCEPTION_CAUGHT, err)
+        exchange.set_header(ErrorHandler.EXCEPTION_CAUGHT, str(err))
+        exchange.set_header(ErrorHandler.EXCEPTION_CAUGHT_DETAIL, traceback.format_exc())
         self.__source.event_failure(err, exchange)
         self.__error_handler.handle_exception(exchange)
       except Exception as err2:
         logger.error("Exception in error handler", exc_info=err2)
-        logger.error("Original exception", exc_info=err)
 
   def process(self, processor):
     self._exchange_handlers.append(ExchangeHandler().set_processor(processor))
