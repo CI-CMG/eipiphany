@@ -17,7 +17,7 @@ class MockEndpoint(Endpoint):
       self.__original_endpoint.process(exchange, configuration)
 
   def get_source(self):
-    return self.__original_endpoint.get_source
+    return self.__original_endpoint.get_source()
 
   @property
   def exchanges(self):
