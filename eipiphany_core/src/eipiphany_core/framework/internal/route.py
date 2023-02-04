@@ -6,7 +6,7 @@ from .exchange_handler import ExchangeHandler
 from ..base.error_handler import ErrorHandler
 from .source_wrapper import SourceWrapper
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('eipiphany.core.framework.internal.Route')
 
 
 
@@ -51,7 +51,8 @@ class Route(object):
         self.__source.event_failure(err, exchange)
         self.__error_handler.handle_exception(exchange)
       except Exception as err2:
-        logger.error("Exception in error handler", exc_info=err2)
+        print("Exception in error handler: " + traceback.format_exc())
+        # logger.error("Exception in error handler", exc_info=err2)
 
   def process(self, processor):
     self._exchange_handlers.append(ExchangeHandler().set_processor(processor))

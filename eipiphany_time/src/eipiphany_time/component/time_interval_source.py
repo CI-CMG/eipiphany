@@ -6,7 +6,7 @@ from time import sleep
 from eipiphany_core.framework.base.source import Source
 from eipiphany_core.message.exchange import Exchange
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('eipiphany.time.component.TimeIntervalSource')
 
 class TimeIntervalSource(Source):
 
