@@ -14,7 +14,7 @@ class Route(object):
 
   def __init__(self, eip_context, endpoint_id, route_id):
     self.__source = eip_context.get_endpoint(endpoint_id).get_source()
-    self._source_wrapper = SourceWrapper(self.__source, self, eip_context.logging_queue)
+    self._source_wrapper = SourceWrapper(self.__source, self, eip_context.logging_queue, eip_context.min_logging_level)
     self.__source.set_source_wrapper(self._source_wrapper)
     self._exchange_handlers = []
     self.__error_handler = None

@@ -1,4 +1,4 @@
-import logging
+import logging.config
 import time
 from multiprocessing import Manager, Queue, Process
 
@@ -6,28 +6,82 @@ from .default_eip_context_termination import DefaultEipContextTermination
 from .exchange_producer import ExchangeProducer
 from ..internal.process_wrapper import ProcessWrapper
 
-def listener_configurer():
-  root = logging.getLogger()
-  # file_handler = logging.handlers.RotatingFileHandler('mptest.log', 'a', 300, 10)
-  console_handler = logging.StreamHandler()
-  formatter = logging.Formatter('%(asctime)s %(processName)-10s %(name)s %(levelname)-8s %(message)s')
-  # file_handler.setFormatter(formatter)
-  console_handler.setFormatter(formatter)
-  # root.addHandler(file_handler)
-  root.addHandler(console_handler)
-  root.setLevel(logging.DEBUG)
-
-def listener_process(queue):
-  listener_configurer()
+def _logging_process(queue, logging_config):
+  logging.config.dictConfig(logging_config)
   while True:
     record = queue.get()
+    if record is None:
+      break
     logger = logging.getLogger(record.name)
-    logger.handle(record)  # No level or filter logic applied - just do it!
+    logger.handle(record)
+
+
+_DEFAULT_LOGGING_CONFIG = {
+  'version': 1,
+  'disable_existing_loggers': False,
+  'formatters': {
+    'simple': {
+      'format': '%(asctime)s - %(levelname)s - %(name)s - %(message)s',
+      'datefmt': '%Y-%m-%d %H:%M:%S'
+    }
+  },
+  'handlers': {
+    'console': {
+      'class': 'logging.StreamHandler',
+      'formatter': 'simple',
+      'stream': 'ext://sys.stdout'
+    }
+  },
+  'loggers': {
+    'eipiphany': {
+      'level': 'INFO',
+      'handlers': ['console'],
+      'propagate': False
+    },
+  },
+  'root': {
+    'level': 'INFO',
+    'handlers': ['console']
+  }
+}
+
+_NAME_TO_LEVEL = {
+  'CRITICAL': logging.CRITICAL,
+  'FATAL': logging.FATAL,
+  'ERROR': logging.ERROR,
+  'WARN': logging.WARNING,
+  'WARNING': logging.WARNING,
+  'INFO': logging.INFO,
+  'DEBUG': logging.DEBUG,
+  'NOTSET': logging.NOTSET,
+}
+
+def _get_min_logging_level(logging_config):
+  min_level = None
+  loggers = logging_config.get('loggers')
+  root = logging_config.get('root')
+  if root and root.get('level'):
+    level = _NAME_TO_LEVEL[root.get('level')]
+    if min_level is None or level < min_level:
+      min_level = level
+  if loggers:
+    for logger_name in loggers:
+      logger = loggers[logger_name]
+      if logger.get('level'):
+        level = _NAME_TO_LEVEL[logger.get('level')]
+        if min_level is None or level < min_level:
+          min_level = level
+  if min_level is None:
+    min_level = logging.DEBUG
+  return min_level
+
+
 
 class EipContext(object):
-  def __init__(self, termination=DefaultEipContextTermination()):
+  def __init__(self, termination=DefaultEipContextTermination(), logging_config=_DEFAULT_LOGGING_CONFIG):
     self.__logging_queue = Queue()
-    self.__logging_listener = Process(target=listener_process, args=(self.__logging_queue,))
+    self.__min_logging_level = _get_min_logging_level(logging_config)
+    self.__logging_listener = Process(target=_logging_process, args=(self.__logging_queue, logging_config))
     self.__logging_listener.daemon = True
     self.__logging_listener.start()
     self.__manager = Manager()
@@ -95,6 +149,10 @@ class EipContext(object):
   @property
   def logging_queue(self):
     return self.__logging_queue
+
+  @property
+  def min_logging_level(self):
+    return self.__min_logging_level
 
   @property
   def processes(self):
