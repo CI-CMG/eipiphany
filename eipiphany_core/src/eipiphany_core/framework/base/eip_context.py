@@ -1,13 +1,35 @@
+import logging
 import time
-from multiprocessing import Manager
+from multiprocessing import Manager, Queue, Process
 
 from .default_eip_context_termination import DefaultEipContextTermination
 from .exchange_producer import ExchangeProducer
 from ..internal.process_wrapper import ProcessWrapper
 
+def listener_configurer():
+  root = logging.getLogger()
+  # file_handler = logging.handlers.RotatingFileHandler('mptest.log', 'a', 300, 10)
+  console_handler = logging.StreamHandler()
+  formatter = logging.Formatter('%(asctime)s %(processName)-10s %(name)s %(levelname)-8s %(message)s')
+  # file_handler.setFormatter(formatter)
+  console_handler.setFormatter(formatter)
+  # root.addHandler(file_handler)
+  root.addHandler(console_handler)
+  root.setLevel(logging.DEBUG)
+
+def listener_process(queue):
+  listener_configurer()
+  while True:
+    record = queue.get()
+    logger = logging.getLogger(record.name)
+    logger.handle(record)  # No level or filter logic applied - just do it!
 
 class EipContext(object):
   def __init__(self, termination=DefaultEipContextTermination()):
+    self.__logging_queue = Queue()
+    self.__logging_listener = Process(target=listener_process, args=(self.__logging_queue,))
+    self.__logging_listener.daemon = True
+    self.__logging_listener.start()
     self.__manager = Manager()
     self._routes = []
     self.__processes = []
@@ -69,6 +91,10 @@ class EipContext(object):
   @property
   def manager(self):
     return self.__manager
+
+  @property
+  def logging_queue(self):
+    return self.__logging_queue
 
   @property
   def processes(self):

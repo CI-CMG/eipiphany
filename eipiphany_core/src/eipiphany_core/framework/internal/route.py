@@ -14,7 +14,7 @@ class Route(object):
 
   def __init__(self, eip_context, endpoint_id, route_id):
     self.__source = eip_context.get_endpoint(endpoint_id).get_source()
-    self._source_wrapper = SourceWrapper(self.__source, self)
+    self._source_wrapper = SourceWrapper(self.__source, self, eip_context.logging_queue)
     self.__source.set_source_wrapper(self._source_wrapper)
     self._exchange_handlers = []
     self.__error_handler = None
@@ -51,8 +51,8 @@ class Route(object):
         self.__source.event_failure(err, exchange)
         self.__error_handler.handle_exception(exchange)
       except Exception as err2:
-        print("Exception in error handler: " + traceback.format_exc())
-        # logger.error("Exception in error handler", exc_info=err2)
+        # print("Exception in error handler: " + traceback.format_exc())
+        logger.error("Exception in error handler", exc_info=err2)
 
   def process(self, processor):
     self._exchange_handlers.append(ExchangeHandler().set_processor(processor))
