@@ -1,5 +1,8 @@
+import logging
 import logging.config
 import time
+from importlib import reload
+from logging.handlers import QueueHandler
 from multiprocessing import Manager, Queue, Process
 
 from .default_eip_context_termination import DefaultEipContextTermination
@@ -7,6 +10,8 @@ from .exchange_producer import ExchangeProducer
 from ..internal.process_wrapper import ProcessWrapper
 
 def _logging_process(queue, logging_config):
+  logging.shutdown()
+  reload(logging)
   logging.config.dictConfig(logging_config)
   while True:
     record = queue.get()
@@ -81,6 +86,11 @@ class EipContext(object):
   def __init__(self, termination=DefaultEipContextTermination(), logging_config=_DEFAULT_LOGGING_CONFIG):
     self.__logging_queue = Queue()
     self.__min_logging_level = _get_min_logging_level(logging_config)
+    logging.shutdown()
+    reload(logging)
+    root = logging.getLogger()
+    root.addHandler(QueueHandler(self.__logging_queue))
+    root.setLevel(self.__min_logging_level)
     self.__logging_listener = Process(target=_logging_process, args=(self.__logging_queue, logging_config))
     self.__logging_listener.daemon = True
     self.__logging_listener.start()

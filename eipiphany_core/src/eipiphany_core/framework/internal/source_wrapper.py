@@ -1,4 +1,5 @@
 import logging
+from importlib import reload
 from logging.handlers import QueueHandler
 
 
@@ -11,6 +12,8 @@ class SourceWrapper:
     self.__logging_level = logging_level
 
   def wait_for_events(self):
+    logging.shutdown()
+    reload(logging)
     root = logging.getLogger()
     root.addHandler(QueueHandler(self.__logging_queue))
     root.setLevel(self.__logging_level)
